@@ -18,8 +18,8 @@ module Beefcake
 
 
     class RequiredFieldNotSetError < StandardError
-      def initialize(name)
-        super("Field #{name} is required but nil")
+      def initialize(name, cl)
+        super("Field #{name} for #{cl} is required but nil")
       end
     end
 
@@ -122,7 +122,7 @@ module Beefcake
       def validate!
         fields.values.each do |fld|
           if fld.rule == :required && self[fld.name].nil?
-            raise RequiredFieldNotSetError, fld.name
+            raise RequiredFieldNotSetError.new(fld.name, self.class)
           end
         end
       end
