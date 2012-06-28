@@ -133,16 +133,16 @@ module Beefcake
     module Decode
       DECODE_CACHE = {}
       def decode(buf, o=self.new)
-        DECODE_CACHE[o.class.name] ||= {}
+        # DECODE_CACHE[o.class.name] ||= {}
         
         if ! buf.is_a?(Buffer)
           buf = Buffer.new(buf)
         end
         
-        key = buf.to_s.unpack("H*").first
-        if key.size < 50 && x = DECODE_CACHE[o.class.name][key]
-          return x
-        end
+        # key = buf.to_s.unpack("H*").first
+        # if key.size < 50 && x = DECODE_CACHE[o.class.name][key]
+        #   return x
+        # end
         
         # TODO: test for incomplete buffer
         while buf.length > 0
@@ -185,7 +185,7 @@ module Beefcake
         end
 
         o.validate!
-        DECODE_CACHE[o.class.name][key] = o
+        # DECODE_CACHE[o.class.name][key] = o
         o
       end
     end
