@@ -15,11 +15,7 @@ module Beefcake
     def self.wire_for(type)
       case type
       when Class
-        if encodable?(type)
-          2
-        else
-          raise UnknownType, type
-        end
+        2
       when :int32, :uint32, :sint32, :int64, :uint64, :sint64, :bool, Module
         0
       when :fixed64, :sfixed64, :double

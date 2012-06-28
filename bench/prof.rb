@@ -141,7 +141,7 @@ def create
 end
 
 
-5.times do
+25.times do
   str = create.encode
   MNPlayerBuffer.decode(str)
 end
