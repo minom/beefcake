@@ -1,4 +1,3 @@
-# $:.unshift File.expand_path('../../lib', __FILE__)
 require './lib/beefcake.rb'
 
 class MyMessage
@@ -142,59 +141,8 @@ def create
 end
 
 
-
-
-if ARGV[0] == 'pprof'
-  # profile message creation/encoding/decoding w/ perftools.rb
-  # works on 1.8 and 1.9
-  #   ruby bench/simple.rb pprof
-  #   open bench/beefcake.prof.gif
-
-  ENV['CPUPROFILE_FREQUENCY'] = '4000'
-  require 'rubygems'
-  require 'perftools'
-  PerfTools::CpuProfiler.start(File.expand_path("../beefcake.prof", __FILE__)) do
-    100.times do
-      str = create.encode
-      MNPlayerBuffer.decode(str)
-    end
-  end
-  Dir.chdir(File.dirname(__FILE__)) do
-    `pprof.rb beefcake.prof --gif > beefcake.prof.gif`
-  end
-
-else
-  # benchmark message creation/encoding/decoding
-  #   rvm install 1.8.7 1.9.2 jruby rbx
-  #   rvm 1.8.7,1.9.2,jruby,rbx ruby bench/simple.rb
-
-  require 'benchmark'
-
-  ITERS = 100
-
-  Benchmark.bm do |x|
-    x.report 'object creation' do
-      ITERS.times do
-        Object.new
-      end
-    end
-    x.report 'message creation' do
-      ITERS.times do
-        create
-      end
-    end
-    x.report 'message encoding' do
-      m = create
-      ITERS.times do
-        m.encode
-      end
-    end
-    x.report 'message decoding' do
-      str = create.encode.to_s
-      ITERS.times do
-        MNPlayerBuffer.decode(str.dup)
-      end
-    end
-  end
-
+5.times do
+  str = create.encode
+  MNPlayerBuffer.decode(str)
 end
+
