@@ -85,8 +85,9 @@ class MNMonsterBuffer
   optional :attackFuzz, :float, 40
   optional :elementalFuzz, :float, 41
   optional :defenseFuzz, :float, 42
-  optional :captureLevel, :int32, 43;
+  optional :captureLevel, :int32, 43
   repeated :levelHistory, MNLevelBuffer, 44
+  # optional :levelHistory, :bytes, 44
   
   optional :raceUID, :int32, 45
 end
@@ -97,7 +98,43 @@ class MNPlayerBuffer
   required :uid, :int64, 1
   required :revision, :int64, 2
   repeated :party, MNMonsterBuffer, 3
+  # optional :party, :bytes, 3
   repeated :monsters, MNMonsterBuffer, 4
+  # optional :monsters, :bytes, 4
+  # repeated :monsters, :bytes, 4
+  repeated :inventory, MNItemCountBuffer, 5
+  required :currentIsland, :string, 6
+  required :ftueState, :int32, 7
+  optional :fbid, :int64, 8
+  optional :fbAccessToken, :string, 9
+  optional :fbExpirationDate, :int32, 10
+  required :season, :int32, 11
+  required :stars, :int32, 12
+  required :progress, :int64, 13
+  repeated :goalsCompleted, :string, 14
+  required :credits, :int32, 15
+  optional :deviceToken, :bytes, 16
+  optional :locksBroken, :int32, 21
+  optional :payForPlaceKeys, :int64, 22
+  optional :name, :string, 23
+end
+
+class MNFancy
+  include Beefcake::Message
+  # optional :fooa, :bytes, 1
+  # optional :foob, :bytes, 2
+  # optional :fooc, :bytes, 3
+  optional :monsters, MNMonsterBuffer, 4
+end
+
+class MNCatfood
+  include Beefcake::Message
+  required :uid, :int64, 1
+  required :revision, :int64, 2
+  repeated :party, MNMonsterBuffer, 3
+  # optional :party, :bytes, 3
+  repeated :monsters, MNMonsterBuffer, 4
+  # optional :monsters, :bytes, 4
   repeated :inventory, MNItemCountBuffer, 5
   required :currentIsland, :string, 6
   required :ftueState, :int32, 7
@@ -140,9 +177,50 @@ def create
   )
 end
 
+def read_file
+  File.read('/Users/teej/Sites/axiom/test/jess').force_encoding('BINARY')
+end
 
-25.times do
-  str = create.encode
-  MNPlayerBuffer.decode(str)
+
+1.times do
+  # str = create.encode
+  # MNPlayerBuffer.decode(str)
+  
+  puts read_file().size
+  player = MNPlayerBuffer.decode(read_file())
+  blep = player.encode.to_s
+  puts blep.size
+  puts "Equal? #{blep == read_file()}"
+  playerb = MNPlayerBuffer.decode(blep)
+  puts playerb.monsters.length
+  puts playerb.encode.to_s.size
+  
+  MNPlayerBuffer.fields.each do |k,v|
+    puts " * #{v.name}: #{player.send(v.name) == playerb.send(v.name)}"
+  end
+  
+  
+  encoded = player.encode.to_s
+  raw = read_file()
+  i = 0
+  encoded.each_char do |chr|
+    if chr != raw[i]
+      puts i, chr, raw[i], "*"
+      break
+    end 
+    i += 1
+  end
+  puts raw.bytesize == encoded.bytesize
+  
+  # bork = player.monsters
+  # puts bork.count
+  # puts bork.first.decode
+  # puts bork
+  # playerb = MNCatfood.decode(player.encode.to_s)
+  # puts playerb.monsters.inspect
+  # bork.each do |x|
+    # testr = MNMonsterBuffer.decode(x)
+    # puts testr.inspect
+  # end
 end
 

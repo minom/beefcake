@@ -131,32 +131,26 @@ module Beefcake
 
 
     module Decode
-      DECODE_CACHE = {}
+      
       def decode(buf, o=self.new)
-        # DECODE_CACHE[o.class.name] ||= {}
         
         if ! buf.is_a?(Buffer)
           buf = Buffer.new(buf)
         end
-        
-        # key = buf.to_s.unpack("H*").first
-        # if key.size < 50 && x = DECODE_CACHE[o.class.name][key]
-        #   return x
-        # end
         
         # TODO: test for incomplete buffer
         while buf.length > 0
           fn, wire = buf.read_info
 
           fld = fields[fn]
-
+          
           # We don't have a field for with index fn.
           # Ignore this data and move on.
           if fld.nil?
             buf.skip(wire)
             next
           end
-
+          
           exp = Buffer.wire_for(fld.type)
           if wire != exp
             raise WrongTypeError.new(fld.name, exp, wire)
@@ -185,7 +179,7 @@ module Beefcake
         end
 
         o.validate!
-        # DECODE_CACHE[o.class.name][key] = o
+        
         o
       end
     end
